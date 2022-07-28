@@ -16,7 +16,7 @@ import { UserModule } from './user/user.module';
 
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: [`.env.${process.env.NODE_ENV}`],
+      envFilePath: [`.env.${process.env.NODE_ENV}`],
     }),
     UserModule,
     AuthModule,
