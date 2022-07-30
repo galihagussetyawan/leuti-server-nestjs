@@ -14,8 +14,9 @@ export class MysqlDatabaseConnectionConfig implements TypeOrmOptionsFactory {
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
                 synchronize: true,
-                dropSchema: true,
+                dropSchema: false,
                 logging: false,
+                autoLoadEntities: true,
                 entities: ['dist/**/*.entity.js'],
             };
         } catch (error) {

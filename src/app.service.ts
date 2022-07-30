@@ -7,8 +7,6 @@ export class AppService {
 
   getHello(): string {
 
-    console.log(this.configService.get<string>('MYSQL_HOST'));
-
     return process.env.DB_HOST;
   }
 }
