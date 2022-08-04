@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
 import * as bcrypt from 'bcrypt';
 import { RoleEntity } from "src/role/role.entity";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class UserService {
@@ -11,9 +12,10 @@ export class UserService {
     constructor(
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
         @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
+        private authService: AuthService,
     ) { };
 
-    async registerUser(user: UserEntity): Promise<any> {
+    async registerUser(user: UserEntity) {
 
         const roleAgent = await this.roleRepository.findOneBy({ name: 'agent' });
 
@@ -29,9 +31,20 @@ export class UserService {
         user.updatedAt = Date.now().toString();
         user.role = [roleAgent];
 
+        const userRoles = [];
+
         try {
 
-            return await this.userRepository.save(user);
+            const userSaved: UserEntity = await this.userRepository.save(user);
+
+            userSaved.role.forEach(role => userRoles.push(role.name));
+
+            return {
+                userId: userSaved.id,
+                username: userSaved.username,
+                roles: userRoles,
+                accessToken: await this.authService.getToken(userSaved.id, userSaved.username, userRoles),
+            };
 
         } catch (error) {
 

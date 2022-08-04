@@ -25,7 +25,9 @@ export class UserEntity {
     @Column({ nullable: true })
     updatedAt: string;
 
-    @ManyToMany(() => RoleEntity)
+    @ManyToMany(() => RoleEntity, {
+        onDelete: 'CASCADE',
+    })
     @JoinTable({
         name: 'user_role',
         joinColumn: {

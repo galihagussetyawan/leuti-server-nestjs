@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { AuthModule } from "src/auth/auth.module";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/role/guard/roles.guard";
 import { RoleEntity } from "src/role/role.entity";
@@ -9,7 +10,8 @@ import { UserService } from "./user.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([UserEntity, RoleEntity])
+        TypeOrmModule.forFeature([UserEntity, RoleEntity]),
+        AuthModule,
     ],
     controllers: [UserController],
     providers: [UserService, JwtAuthGuard, RolesGuard],

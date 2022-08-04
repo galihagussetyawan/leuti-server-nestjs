@@ -21,10 +21,10 @@ export class AuthService {
             }
         })
 
-        if (!user) throw new NotFoundException('username atau password tidak ditemukan');
+        if (!user) throw new NotFoundException('username tidak ditemukan');
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) throw new UnauthorizedException('credential incorrect');
+        if (!isMatch) throw new UnauthorizedException('password salah');
 
         const userRoles = [];
 

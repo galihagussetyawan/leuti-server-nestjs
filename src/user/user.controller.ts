@@ -1,5 +1,4 @@
 import { Body, Controller, Get, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Roles } from "src/role/decorator/roles.decorator";
@@ -25,8 +24,8 @@ export class UserController {
 
         } catch (error) {
 
-            res.status(error.response.statusCode).send({
-                status: error.response.statusCode,
+            res.status(error.status).send({
+                status: error.status,
                 error_message: error.message,
             })
         }
@@ -34,7 +33,7 @@ export class UserController {
 
     @Get('users')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.AGENT)
+    @Roles(Role.ADMIN)
     async getAllUser(@Res() res: Response) {
 
         try {
@@ -46,8 +45,8 @@ export class UserController {
 
         } catch (error) {
 
-            res.status(error.response.statusCode).send({
-                status: error.response.statusCode,
+            res.status(error.status).send({
+                status: error.status,
                 error_message: error.message,
             })
 
