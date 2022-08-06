@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
-import { Response } from "express";
+import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Request, Response } from "express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Roles } from "src/role/decorator/roles.decorator";
 import { RolesGuard } from "src/role/guard/roles.guard";
@@ -50,6 +50,56 @@ export class UserController {
                 error_message: error.message,
             })
 
+        }
+    }
+
+    @Get('user')
+    async getUserById(@Req() req: Request, @Res() res: Response) {
+
+        let { id } = req.query;
+
+        try {
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.userService.getUserById(id.toString()),
+            })
+
+        } catch (error) {
+
+            if (!id) {
+                res.status(HttpStatus.BAD_REQUEST).send({
+                    status: HttpStatus.BAD_REQUEST,
+                    error_message: 'user id kosong'
+                })
+            }
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+        }
+    }
+
+    @Delete('user')
+    async deleteUserById(@Req() req: Request, @Res() res: Response) {
+
+        const { id } = req.query;
+
+        try {
+            await this.userService.deleteUserById(id.toString());
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: 'success deleted',
+            })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
         }
     }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
@@ -82,6 +82,55 @@ export class UserService {
             })
 
             return userList;
+
+        } catch (error) {
+
+            throw new Error(error.message);
+        }
+    }
+
+    async getUserById(id: string) {
+
+        if (!id) {
+            throw new BadRequestException('user id kosong');
+        }
+
+        const response = await this.userRepository.findOne({
+            where: {
+                id,
+            },
+            relations: {
+                role: true,
+            }
+        })
+
+        if (!response) {
+            throw new NotFoundException('user tidak ditemukan');
+        }
+
+        try {
+
+            return {
+                id: response.id,
+                firstname: response.firstname,
+                lastname: response.lastname,
+                username: response.username,
+                roles: response.role.map(role => role.name),
+                createdAt: response.createdAt,
+                updatedAt: response.updatedAt,
+            }
+
+        } catch (error) {
+
+            throw new Error(error.message);
+        }
+    }
+
+    async deleteUserById(id: string) {
+
+        try {
+
+            return await this.userRepository.delete({ id });
 
         } catch (error) {
 
