@@ -5,6 +5,7 @@ import { UserEntity } from "./user.entity";
 import * as bcrypt from 'bcrypt';
 import { RoleEntity } from "src/role/role.entity";
 import { AuthService } from "src/auth/auth.service";
+import { PointService } from "src/point/point.service";
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
         @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
         private authService: AuthService,
+        private pointService: PointService,
     ) { };
 
     async registerUser(user: UserEntity) {
@@ -37,6 +39,8 @@ export class UserService {
 
             const userSaved: UserEntity = await this.userRepository.save(user);
 
+            await this.pointService.createPointByUser(userSaved);
+
             userSaved.role.forEach(role => userRoles.push(role.name));
 
             return {
@@ -48,7 +52,7 @@ export class UserService {
 
         } catch (error) {
 
-            console.log(error.message);
+            console.log(error);
 
             if (error.code === 'ER_DUP_ENTRY') throw new BadRequestException('username sudah digunakan');
         }
@@ -103,6 +107,7 @@ export class UserService {
                 role: true,
             }
         })
+
 
         if (!response) {
             throw new NotFoundException('user tidak ditemukan');

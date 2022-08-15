@@ -1,5 +1,5 @@
 import { RoleEntity } from "src/role/role.entity";
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -18,6 +18,9 @@ export class UserEntity {
 
     @Column({ nullable: false })
     password: string;
+
+    @Column({ name: 'email', unique: true })
+    email: string;
 
     @Column({ nullable: true })
     createdAt: string;

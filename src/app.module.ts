@@ -6,9 +6,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
+import { CartModule } from './cart/cart.module';
 import { MysqlDatabaseConnectionConfig } from './commons/config/database/mysql-database-connection.config';
+import { OrderModule } from './order/order.module';
+import { PointModule } from './point/point.module';
+import { ProductModule } from './product/product.module';
 import { RolesGuard } from './role/guard/roles.guard';
 import { RoleModule } from './role/role.module';
+import { UserDetailModule } from './user-detail/user-detail.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -26,6 +31,11 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     RoleModule,
+    UserDetailModule,
+    ProductModule,
+    CartModule,
+    OrderModule,
+    PointModule,
   ],
   controllers: [AppController],
   providers: [
