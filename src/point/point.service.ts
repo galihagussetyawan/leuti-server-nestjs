@@ -50,6 +50,30 @@ export class PointService {
         }
     }
 
+    async getPointByUser(userid: string) {
+
+        try {
+
+            const user = await this.userRepository.findOneBy({ id: userid });
+
+            const points = await this.pointRepository.findOne({
+                relations: {
+                    user: true,
+                },
+                where: {
+                    user
+                }
+            })
+
+            return {
+                point: points.point,
+            }
+
+        } catch (error) {
+
+        }
+    }
+
     async getAllPoints() {
 
         try {
@@ -58,6 +82,9 @@ export class PointService {
                 relations: {
                     user: true,
                 },
+                order: {
+                    point: 'DESC',
+                }
             })
 
             return pointList.map(data => {
@@ -68,6 +95,23 @@ export class PointService {
                     join: data.user.createdAt,
                 }
             })
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+
+        }
+    }
+
+    async updatePointById(id: string, point: number) {
+
+        try {
+
+            const points = new PointEntity();
+            points.point = point;
+            points.updatedAt = Date.now().toString();
+
+            return await this.pointRepository.update(id, points);
 
         } catch (error) {
 

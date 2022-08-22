@@ -52,8 +52,6 @@ export class UserService {
 
         } catch (error) {
 
-            console.log(error);
-
             if (error.code === 'ER_DUP_ENTRY') throw new BadRequestException('username sudah digunakan');
         }
     }
@@ -116,13 +114,14 @@ export class UserService {
         try {
 
             return {
-                id: response.id,
-                firstname: response.firstname,
-                lastname: response.lastname,
-                username: response.username,
-                roles: response.role.map(role => role.name),
-                createdAt: response.createdAt,
-                updatedAt: response.updatedAt,
+                id: response?.id,
+                firstname: response?.firstname,
+                lastname: response?.lastname,
+                username: response?.username,
+                roles: response?.role.map(role => role.name),
+                email: response?.email,
+                createdAt: response?.createdAt,
+                updatedAt: response?.updatedAt,
             }
 
         } catch (error) {

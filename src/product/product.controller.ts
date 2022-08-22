@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Post, Put, Req, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Post, Put, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { ProductEntity } from "./product.entity";
 import { ProductService } from "./product.service";
@@ -57,6 +57,8 @@ export class ProductController {
         try {
 
             const { id } = req.query;
+
+            if (!id) throw new BadRequestException('id product parameter required');
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,

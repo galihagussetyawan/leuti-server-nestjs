@@ -68,9 +68,7 @@ export class CartService {
 
             const cart = await this.cartRepository.find({
                 where: { user },
-                relations: {
-                    product: true,
-                }
+                relations: ['product', 'product.images'],
             })
 
             return cart;

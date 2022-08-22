@@ -15,7 +15,7 @@ export class CartEntity {
     @Column({ name: 'amount' })
     amount: number;
 
-    @Column({ name: 'isCheckout' })
+    @Column({ name: 'isCheckout', default: true })
     checkout: boolean;
 
     @Column({ name: 'createdAt' })
@@ -27,7 +27,7 @@ export class CartEntity {
     @ManyToOne(() => UserEntity, { lazy: true })
     user: UserEntity;
 
-    @OneToOne(() => ProductEntity)
+    @OneToOne(() => ProductEntity, { onDelete: 'CASCADE' })
     @JoinColumn()
     product: ProductEntity;
 

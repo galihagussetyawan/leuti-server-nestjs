@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { CartModule } from './cart/cart.module';
 import { MysqlDatabaseConnectionConfig } from './commons/config/database/mysql-database-connection.config';
+import { ImageModule } from './image/image.module';
 import { OrderModule } from './order/order.module';
 import { PointModule } from './point/point.module';
 import { ProductModule } from './product/product.module';
@@ -36,6 +37,7 @@ import { UserModule } from './user/user.module';
     CartModule,
     OrderModule,
     PointModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [
