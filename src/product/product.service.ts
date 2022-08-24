@@ -59,7 +59,12 @@ export class ProductService {
 
         try {
 
-            const product = await this.productRepository.findOneBy({ id });
+            const product = await this.productRepository.findOne({
+                where: { id },
+                relations: {
+                    images: true,
+                }
+            });
 
             if (!product) {
                 throw new NotFoundException('product tidak ditemukan');

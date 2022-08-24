@@ -42,8 +42,8 @@ export class CartController {
 
         try {
 
-            res.status(HttpStatus.CREATED).send({
-                status: HttpStatus.CREATED,
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
                 data: await this.cartService.getCartByUser(principal.sub),
             })
 
@@ -76,6 +76,7 @@ export class CartController {
                 status: error.status,
                 error_message: error.message,
             })
+
 
         }
     }

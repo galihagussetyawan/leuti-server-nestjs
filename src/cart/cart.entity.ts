@@ -27,8 +27,7 @@ export class CartEntity {
     @ManyToOne(() => UserEntity, { lazy: true })
     user: UserEntity;
 
-    @OneToOne(() => ProductEntity, { onDelete: 'CASCADE' })
-    @JoinColumn()
+    @ManyToOne(() => ProductEntity, { cascade: true })
     product: ProductEntity;
 
     @ManyToOne(() => OrderEntity, (order) => order.carts, { lazy: true })
