@@ -31,6 +31,10 @@ export class CartService {
                 throw new NotFoundException('product tidak ditemukan');
             }
 
+            if (cartBody.quantity < 1) {
+                throw new BadRequestException('Minimum pembelian 1 items');
+            }
+
             if (cartBody.quantity > product.stock) {
                 throw new BadRequestException(`Produk tersisa ${product.stock}`);
             }
@@ -83,9 +87,24 @@ export class CartService {
 
         try {
 
-            cartBody.updatedAt = Date.now().toString();
+            const cart = await this.cartRepository.findOne({
+                where: { id },
+                relations: ['product']
+            });
 
-            return await this.cartRepository.update(id, cartBody);
+            if (cartBody.quantity < 1) {
+                throw new BadRequestException('Minimun pembelian 1 items');
+            }
+
+            if (cartBody?.quantity > cart?.product?.stock) {
+                throw new BadRequestException(`Produk tersisa ${cart?.product?.stock}`);
+            }
+
+            const updatedQuantity = cart.quantity = cartBody.quantity;
+            const updatedAmout = cart.amount = cart.product.price * cartBody.quantity;
+            const updatedAt = Date.now().toString();
+
+            return await this.cartRepository.update(id, { quantity: updatedQuantity, amount: updatedAmout, updatedAt });
 
         } catch (error) {
 

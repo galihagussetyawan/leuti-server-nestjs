@@ -77,7 +77,6 @@ export class CartController {
                 error_message: error.message,
             })
 
-
         }
     }
 

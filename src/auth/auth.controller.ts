@@ -23,6 +23,7 @@ export class AuthController {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
+                message: 'logged in successfully',
                 data: await this.authService.signin(requestSignin.username, requestSignin.password),
             })
 
