@@ -1,5 +1,6 @@
 import { RoleEntity } from "src/role/role.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { UserDetailEntity } from "src/user-detail/user-detail.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -29,7 +30,7 @@ export class UserEntity {
     updatedAt: string;
 
     @ManyToMany(() => RoleEntity, {
-        onDelete: 'CASCADE',
+        cascade: true,
     })
     @JoinTable({
         name: 'user_role',
@@ -43,4 +44,8 @@ export class UserEntity {
         }
     })
     role: RoleEntity[];
+
+    @OneToOne(() => UserDetailEntity, { cascade: true })
+    @JoinColumn()
+    userDetail: UserDetailEntity;
 }

@@ -16,7 +16,7 @@ export class PointEntity {
     @Column({ name: 'updatedAt' })
     updatedAt: string;
 
-    @OneToOne(() => UserEntity)
+    @OneToOne(() => UserEntity, { cascade: true })
     @JoinColumn()
     user: UserEntity;
 }

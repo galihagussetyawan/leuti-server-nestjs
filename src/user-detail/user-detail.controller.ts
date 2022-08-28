@@ -10,7 +10,7 @@ export class UserDetailController {
 
     constructor(private userDetailService: UserDetailService) { }
 
-    @Post('user/detail')
+    @Put('user/detail')
     @UseGuards(JwtAuthGuard)
     async addUserDetailToUser(@PrincipalDecorator() principle: any, @Body() requestUserDetail: UserDetailEntity, @Res() res: Response) {
 
@@ -20,29 +20,6 @@ export class UserDetailController {
                 status: HttpStatus.OK,
                 message: 'success add user detail',
                 data: await this.userDetailService.addUserDetailToUSer(principle.sub, requestUserDetail),
-            })
-
-        } catch (error) {
-
-            res.status(error.status).send({
-                status: error.status,
-                error_message: error.message,
-            })
-
-        }
-    }
-
-    @Get('user/detail')
-    @UseGuards(JwtAuthGuard)
-    async getUserDetailByUser(@Req() req: Request, @Res() res: Response) {
-
-        try {
-
-            const { userid } = req.query;
-
-            res.status(HttpStatus.OK).send({
-                status: HttpStatus.OK,
-                data: await this.userDetailService.getUserDetailByUser(userid.toString()),
             })
 
         } catch (error) {

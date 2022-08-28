@@ -81,10 +81,7 @@ export class ImageController {
 
         } catch (error) {
 
-            res.status(error.status).send({
-                status: error.status,
-                error_message: 'image not found'
-            })
+            res.end('NOT FOUND');
 
         }
     }

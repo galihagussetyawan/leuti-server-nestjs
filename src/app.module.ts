@@ -14,6 +14,7 @@ import { PointModule } from './point/point.module';
 import { ProductModule } from './product/product.module';
 import { RolesGuard } from './role/guard/roles.guard';
 import { RoleModule } from './role/role.module';
+import { ShippingModule } from './shipping/shipping,module';
 import { UserDetailModule } from './user-detail/user-detail.module';
 import { UserModule } from './user/user.module';
 
@@ -38,6 +39,7 @@ import { UserModule } from './user/user.module';
     OrderModule,
     PointModule,
     ImageModule,
+    ShippingModule,
   ],
   controllers: [AppController],
   providers: [

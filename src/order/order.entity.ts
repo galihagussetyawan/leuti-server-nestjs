@@ -1,26 +1,30 @@
 import { CartEntity } from "src/cart/cart.entity";
+import { ShippingEntity } from "src/shipping/shipping.entity";
 import { UserEntity } from "src/user/user.entity";
-import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'orders' })
 export class OrderEntity {
 
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
-    @Column({ name: 'amount' })
+    @Column({ name: 'amount', default: 0 })
     amount: number;
 
-    @Column({ name: 'status' })
+    @Column({ name: 'status', default: 'processed' })
     status: string;
 
     @Column({ name: 'createdAt' })
     createdAt: string;
 
-    @ManyToOne(() => UserEntity, { lazy: true, cascade: true })
+    @ManyToOne(() => UserEntity, { cascade: true })
     user: UserEntity;
 
-    @OneToMany(() => CartEntity, (cart) => cart.order)
+    @ManyToMany(() => CartEntity, { cascade: true })
     @JoinTable()
-    carts: Promise<CartEntity[]>
+    carts: CartEntity[];
+
+    @ManyToOne(() => ShippingEntity, { cascade: true })
+    shipping: ShippingEntity;
 }

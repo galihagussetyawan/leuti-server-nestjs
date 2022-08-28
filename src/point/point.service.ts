@@ -54,14 +54,14 @@ export class PointService {
 
         try {
 
-            const user = await this.userRepository.findOneBy({ id: userid });
-
             const points = await this.pointRepository.findOne({
                 relations: {
                     user: true,
                 },
                 where: {
-                    user
+                    user: {
+                        id: userid,
+                    }
                 }
             })
 
@@ -84,10 +84,15 @@ export class PointService {
                 },
                 order: {
                     point: 'DESC',
+                },
+                where: {
+                    user: {
+                        role: { name: 'agent' },
+                    }
                 }
             })
 
-            return pointList.map(data => {
+            return await pointList.map(data => {
 
                 return {
                     point: data.point,

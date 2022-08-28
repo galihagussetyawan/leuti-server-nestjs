@@ -24,12 +24,12 @@ export class CartEntity {
     @Column({ name: 'updatedAt' })
     updatedAt: string;
 
-    @ManyToOne(() => UserEntity, { lazy: true })
+    @Column({ name: 'visibility', default: true })
+    visibility: boolean;
+
+    @ManyToOne(() => UserEntity, { lazy: true, cascade: true })
     user: UserEntity;
 
     @ManyToOne(() => ProductEntity, { cascade: true })
     product: ProductEntity;
-
-    @ManyToOne(() => OrderEntity, (order) => order.carts, { lazy: true })
-    order: OrderEntity;
 }

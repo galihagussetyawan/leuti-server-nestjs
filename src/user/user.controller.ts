@@ -102,4 +102,26 @@ export class UserController {
             })
         }
     }
+
+    @Get('users/search')
+    async searchUserByIdOrUsername(@Req() req: Request, @Res() res: Response) {
+
+        try {
+
+            const { search } = req.query;
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.userService.searchUserByIdOrUsername(search.toString()),
+            })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+
+        }
+    }
 }

@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
 import * as bcrypt from 'bcrypt';
 import { RoleEntity } from "src/role/role.entity";
 import { AuthService } from "src/auth/auth.service";
 import { PointService } from "src/point/point.service";
+import { UserDetailEntity } from "src/user-detail/user-detail.entity";
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
     constructor(
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
         @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
+        @InjectRepository(UserDetailEntity) private userDetailRepository: Repository<UserDetailEntity>,
         private authService: AuthService,
         private pointService: PointService,
     ) { };
@@ -58,19 +60,18 @@ export class UserService {
 
     async getAllUser() {
 
-        const userList = [];
-
         try {
 
-            const list = await this.userRepository.find({
+            const [list, count] = await this.userRepository.findAndCount({
                 relations: {
                     role: true,
+                    userDetail: true,
                 }
             });
 
-            list.forEach(data => {
+            const responseList = await list.map(data => {
 
-                const response = {
+                return {
                     id: data.id,
                     username: data.username,
                     firstname: data.firstname,
@@ -78,12 +79,15 @@ export class UserService {
                     role: data.role,
                     createdAt: data.createdAt,
                     updatedAt: data.updatedAt,
-                };
+                    detail: data.userDetail,
+                }
 
-                userList.push(response);
             })
 
-            return userList;
+            return {
+                total: count,
+                items: await responseList,
+            }
 
         } catch (error) {
 
@@ -103,6 +107,7 @@ export class UserService {
             },
             relations: {
                 role: true,
+                userDetail: true,
             }
         })
 
@@ -122,6 +127,7 @@ export class UserService {
                 email: response?.email,
                 createdAt: response?.createdAt,
                 updatedAt: response?.updatedAt,
+                detail: response?.userDetail,
             }
 
         } catch (error) {
@@ -139,6 +145,46 @@ export class UserService {
         } catch (error) {
 
             throw new Error(error.message);
+        }
+    }
+
+    async searchUserByIdOrUsername(search: string) {
+
+        try {
+
+            const [list, count] = await this.userRepository.findAndCount({
+                where: [
+                    { id: search },
+                    { username: Like(`%${search}%`) },
+                ],
+                relations: {
+                    userDetail: true,
+                }
+            })
+
+            const responseList = await list.map(data => {
+
+                return {
+                    id: data.id,
+                    username: data.username,
+                    firstname: data.firstname,
+                    lastname: data.lastname,
+                    role: data.role,
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt,
+                    detail: data.userDetail,
+                }
+            })
+
+            return {
+                total: count,
+                items: await responseList,
+            }
+
+        } catch (error) {
+
+            throw new Error(error.message);
+
         }
     }
 }
