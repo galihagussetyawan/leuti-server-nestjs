@@ -45,7 +45,7 @@ export class ProductService {
             return await this.productRepository.find({
                 relations: {
                     images: true,
-                }
+                },
             });
 
         } catch (error) {

@@ -12,7 +12,7 @@ export class OrderEntity {
     @Column({ name: 'amount', default: 0 })
     amount: number;
 
-    @Column({ name: 'status', default: 'processed' })
+    @Column({ name: 'status', default: 'created' })
     status: string;
 
     @Column({ name: 'createdAt' })

@@ -76,6 +76,7 @@ export class UserService {
                     username: data.username,
                     firstname: data.firstname,
                     lastname: data.lastname,
+                    email: data.email,
                     role: data.role,
                     createdAt: data.createdAt,
                     updatedAt: data.updatedAt,

@@ -1,9 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CartEntity } from "src/cart/cart.entity";
+import { PointEntity } from "src/point/point.entity";
+import { ProductEntity } from "src/product/product.entity";
 import { ShippingEntity } from "src/shipping/shipping.entity";
 import { UserEntity } from "src/user/user.entity";
-import { Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 import { OrderEntity } from "./order.entity";
 
 @Injectable()
@@ -14,6 +16,8 @@ export class OrderService {
         @InjectRepository(CartEntity) private cartRepository: Repository<CartEntity>,
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
         @InjectRepository(ShippingEntity) private shippingRepository: Repository<ShippingEntity>,
+        @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
+        @InjectRepository(PointEntity) private pointRepository: Repository<PointEntity>,
     ) { }
 
     async createOrderByUser(userid: string) {
@@ -31,11 +35,11 @@ export class OrderService {
                 }
             })
 
-            if (carts.length === 0) {
+            if (carts?.length === 0) {
                 throw new NotFoundException('cart kosong');
             }
 
-            carts?.forEach(data => {
+            await carts?.forEach(data => {
 
                 if (data?.quantity > data?.product?.stock) {
                     throw new BadRequestException(`Cek produk tersisa`);
@@ -45,13 +49,26 @@ export class OrderService {
 
             const totalCartAmount = await carts.map(data => data.amount).reduce((prev, next) => prev + next);
 
+            const product = carts.map(data => {
+                data.product.stock = data?.product?.stock - data?.quantity;
+                return data?.product;
+            });
+
+            // set cart if create order isvisibility, ischeckout = false
+            carts.forEach(data => {
+                data.visibility = false;
+                data.checkout = false;
+
+                return data;
+            })
+
             const order = new OrderEntity();
             order.createdAt = Date.now().toString();
             order.user = user;
             order.carts = carts;
             order.amount = totalCartAmount;
 
-            carts.forEach(async data => await this.cartRepository.update(data.id, { checkout: false, visibility: false }));
+            await this.productRepository.save(product);
             return await this.orderRepository.save(order);
 
         } catch (error) {
@@ -81,6 +98,10 @@ export class OrderService {
                     }
                 }
             })
+
+            if (!order) {
+                throw new NotFoundException('order not found');
+            }
 
             if (order?.user?.id !== userid) {
                 throw new ForbiddenException('forbidden');
@@ -125,22 +146,39 @@ export class OrderService {
         } catch (error) {
 
             throw new BadRequestException(error.message);
+
         }
     }
 
-    async getAllOrders(status: string = 'processed',) {
+    async getAllOrders(status: string) {
+
+        const statusCheck = () => {
+
+            if (status === 'now-orders') {
+                return ['approve', 'in-packaging', 'in-shipping'];
+            }
+
+            if (status === 'history-orders') {
+                return ['completed', 'canceled'];
+            }
+
+            return ['created', 'unpaid'];
+        }
 
         try {
 
             return await this.orderRepository.find({
                 where: {
-                    status: status,
+                    status: In(statusCheck())
                 },
                 relations: {
-                    carts: true,
+                    carts: {
+                        product: true,
+                    },
                     user: {
                         userDetail: true,
-                    }
+                    },
+                    shipping: true,
                 },
                 select: {
                     user: {
@@ -154,7 +192,9 @@ export class OrderService {
             })
 
         } catch (error) {
+
             throw new BadRequestException(error.message);
+
         }
     }
 
@@ -168,7 +208,7 @@ export class OrderService {
 
             const shipping = await this.shippingRepository.save(shippingRequestBody);
 
-            return await this.orderRepository.update(id, { shipping: shipping });
+            return await this.orderRepository.update(id, { shipping: shipping, status: 'unpaid' });
 
         } catch (error) {
 
@@ -178,25 +218,145 @@ export class OrderService {
     }
 
     //seller function order service
-    async acceptOrder(id: string) {
+    async cancelOrderById(id: string) {
 
         try {
 
             const order = await this.orderRepository.findOne({
+                where: { id },
+                relations: {
+                    carts: {
+                        product: true,
+                    }
+                }
+            })
+
+            const products = order?.carts?.map(data => {
+                data.product.stock = data?.product?.stock + data?.quantity;
+                return data?.product;
+            })
+
+            await this.productRepository.save(products);
+            return await this.orderRepository.update(id, { status: 'canceled' });
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+
+        }
+    }
+
+    async approveOrder(id: string) {
+
+        try {
+
+            const order = await this.orderRepository.findOne({
+                where: { id },
+                relations: {
+                    user: true,
+                    carts: true,
+                },
+            })
+            const plusPoint = order?.carts.map(data => data?.quantity).reduce((prev, next) => prev + next);
+
+            const point = await this.pointRepository.findOneBy({ user: order?.user });
+
+            await this.pointRepository.update(point.id, { point: point?.point + plusPoint, updatedAt: Date.now().toString() });
+            return await this.orderRepository.update(id, { status: 'approve' });
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+        }
+    }
+
+    async updateStatusOrderInPackagingById(id: string) {
+
+        try {
+
+            return await this.orderRepository.update(id, { status: 'in-packaging' })
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+
+        }
+    }
+
+    async updateStatusOrderInShippingById(id: string) {
+
+        try {
+
+            return await this.orderRepository.update(id, { status: 'in-shipping' });
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+
+        }
+    }
+
+    async completeOrderById(id: string) {
+
+        try {
+
+            return await this.orderRepository.update(id, { status: 'completed' });
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+
+        }
+    }
+
+    async searchOrders(id: string, status: string) {
+
+        const statusCheck = () => {
+
+            if (status === 'now-orders') {
+                return ['approve', 'in-packaging', 'in-shipping'];
+            }
+
+            if (status === 'history-orders') {
+                return ['completed', 'canceled'];
+            }
+
+            return ['created', 'unpaid'];
+        }
+
+        try {
+
+            const order = await this.orderRepository.find({
                 where: {
-                    id
+                    id: id,
+                    status: In(statusCheck()),
                 },
                 relations: {
                     carts: {
                         product: true,
                     },
-                    user: true,
+                    user: {
+                        userDetail: true,
+                    },
+                    shipping: true,
+                },
+                select: {
+                    user: {
+                        id: true,
+                        username: true,
+                    }
+                },
+                order: {
+                    createdAt: 'DESC',
                 }
             })
+
+            return order;
 
         } catch (error) {
 
             throw new BadRequestException(error.message);
+
         }
     }
 }
