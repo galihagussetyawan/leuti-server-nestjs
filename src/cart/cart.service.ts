@@ -21,6 +21,9 @@ export class CartService {
             const user = await this.userRepository.findOneBy({ id: userid });
             const product = await this.productRepository.findOne({
                 where: { id: productid },
+                relations: {
+                    discounts: true,
+                }
             })
 
             if (!user) {
@@ -39,12 +42,20 @@ export class CartService {
                 throw new BadRequestException(`Produk tersisa ${product.stock}`);
             }
 
+            //check discount product
             const cart = new CartEntity();
+            const discount = product?.discounts.filter(data => data?.quantity === cartBody.quantity)[0];
+
+            if (discount) {
+                cart.quantity = cartBody?.quantity + discount?.item;
+                cart.discount = discount;
+            }
+
             cart.user = user;
+            cart.quantity = cartBody?.quantity;
+            cart.amount = product?.price * cartBody?.quantity;
             cart.product = product;
-            cart.quantity = cartBody.quantity;
-            cart.amount = product.price * cartBody.quantity;
-            cart.checkout = cartBody.checkout;
+            cart.checkout = cartBody?.checkout;
             cart.createdAt = Date.now().toString();
             cart.updatedAt = Date.now().toString();
 
@@ -72,7 +83,13 @@ export class CartService {
 
             const cart = await this.cartRepository.find({
                 where: { user, visibility: true },
-                relations: ['product', 'product.images'],
+                relations: {
+                    product: {
+                        images: true,
+                        discounts: true,
+                    },
+                    discount: true,
+                }
             })
 
             return cart;
@@ -89,10 +106,15 @@ export class CartService {
 
             const cart = await this.cartRepository.findOne({
                 where: { id },
-                relations: ['product']
+                relations: {
+                    product: {
+                        discounts: true,
+                    },
+                    discount: true,
+                }
             });
 
-            if (cartBody.quantity < 1) {
+            if (cartBody?.quantity < 1) {
                 throw new BadRequestException('Minimun pembelian 1 items');
             }
 
@@ -100,11 +122,21 @@ export class CartService {
                 throw new BadRequestException(`Produk tersisa ${cart?.product?.stock}`);
             }
 
-            const updatedQuantity = cart.quantity = cartBody.quantity;
-            const updatedAmout = cart.amount = cart.product.price * cartBody.quantity;
-            const updatedAt = Date.now().toString();
+            const discount = cart?.product?.discounts?.filter(data => data?.quantity === cartBody?.quantity)[0];
 
-            return await this.cartRepository.update(id, { quantity: updatedQuantity, amount: updatedAmout, updatedAt });
+            if (discount) {
+                cart.quantity = cartBody?.quantity + discount?.item;
+                cart.discount = discount;
+            } else {
+                cart.discount = null;
+            }
+
+            cart.quantity = cartBody?.quantity;
+            cart.amount = cart?.product?.price * cartBody?.quantity;
+            cart.updatedAt = Date.now().toString();
+
+            return await this.cartRepository.save(cart);
+
 
         } catch (error) {
 

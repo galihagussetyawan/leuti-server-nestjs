@@ -49,7 +49,7 @@ export class AuthService {
                 roles
             },
             {
-                secret: 'secret-key',
+                secret: 'zKVn0AVs4mUYOZ1gJPydmYhAhhySqtl1penuV5JXOPU=',
                 expiresIn: '365d',
             }
         )

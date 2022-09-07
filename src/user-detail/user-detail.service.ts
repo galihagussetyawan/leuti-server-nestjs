@@ -20,7 +20,7 @@ export class UserDetailService {
             userDetailBody.updatedAt = Date.now().toString();
 
             const savedUserDetail = await this.userDetailRepository.save(userDetailBody);
-            const userDetailSaved = await this.userRepository.update(userId, { userDetail: await savedUserDetail })
+            const userDetailSaved = await this.userRepository.update(userId, { userDetail: savedUserDetail })
 
             return userDetailSaved;
 
@@ -35,14 +35,14 @@ export class UserDetailService {
         try {
 
             const userDetail = new UserDetailEntity();
-            userDetail.country = userDetailBody.country;
-            userDetail.province = userDetailBody.province;
-            userDetail.city = userDetailBody.city;
-            userDetail.districts = userDetailBody.districts;
-            userDetail.village = userDetailBody.village;
-            userDetail.address = userDetailBody.address;
-            userDetail.postalCode = userDetailBody.postalCode;
-            userDetail.phone = userDetailBody.phone;
+            userDetail.country = userDetailBody?.country;
+            userDetail.province = userDetailBody?.province;
+            userDetail.city = userDetailBody?.city;
+            userDetail.district = userDetailBody?.district;
+            userDetail.village = userDetailBody?.village;
+            userDetail.address = userDetailBody?.address;
+            userDetail.postalCode = userDetailBody?.postalCode;
+            userDetail.phone = userDetailBody?.phone;
             userDetail.updatedAt = Date.now().toString();
 
             const userDetailUpdated = await this.userDetailRepository.update(id, userDetail);

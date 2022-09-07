@@ -18,8 +18,8 @@ export class UserDetailEntity {
     @Column({ name: 'city' })
     city: string;
 
-    @Column({ name: 'districts' })
-    districts: string;
+    @Column({ name: 'district' })
+    district: string;
 
     @Column({ name: 'village' })
     village: string;

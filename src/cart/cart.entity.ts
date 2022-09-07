@@ -1,7 +1,7 @@
-import { OrderEntity } from "src/order/order.entity";
+import { DiscountEntity } from "src/discount/discount.entity";
 import { ProductEntity } from "src/product/product.entity";
 import { UserEntity } from "src/user/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'carts' })
 export class CartEntity {
@@ -32,4 +32,7 @@ export class CartEntity {
 
     @ManyToOne(() => ProductEntity, { cascade: true })
     product: ProductEntity;
+
+    @ManyToOne(() => DiscountEntity)
+    discount: DiscountEntity;
 }

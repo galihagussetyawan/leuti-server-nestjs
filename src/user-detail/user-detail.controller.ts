@@ -10,7 +10,7 @@ export class UserDetailController {
 
     constructor(private userDetailService: UserDetailService) { }
 
-    @Put('user/detail')
+    @Post('user/detail')
     @UseGuards(JwtAuthGuard)
     async addUserDetailToUser(@PrincipalDecorator() principle: any, @Body() requestUserDetail: UserDetailEntity, @Res() res: Response) {
 

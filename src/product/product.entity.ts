@@ -1,5 +1,6 @@
+import { DiscountEntity } from "src/discount/discount.entity";
 import { ImageEntity } from "src/image/image.entity";
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'products' })
 export class ProductEntity {
@@ -37,7 +38,13 @@ export class ProductEntity {
     @Column({ name: 'updatedAt' })
     updatedAt: string;
 
+    @Column({ name: 'active', default: true })
+    status: boolean;
+
     @ManyToMany(() => ImageEntity, { cascade: true })
     @JoinTable()
     images: ImageEntity[];
+
+    @OneToMany(() => DiscountEntity, (discount) => discount.product)
+    discounts: DiscountEntity[];
 }

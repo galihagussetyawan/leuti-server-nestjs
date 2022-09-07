@@ -5,7 +5,7 @@ import { PointEntity } from "src/point/point.entity";
 import { ProductEntity } from "src/product/product.entity";
 import { ShippingEntity } from "src/shipping/shipping.entity";
 import { UserEntity } from "src/user/user.entity";
-import { In, Like, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { OrderEntity } from "./order.entity";
 
 @Injectable()
@@ -112,7 +112,6 @@ export class OrderService {
         } catch (error) {
 
             throw new BadRequestException(error.message);
-
         }
     }
 
@@ -257,7 +256,7 @@ export class OrderService {
                     carts: true,
                 },
             })
-            const plusPoint = order?.carts.map(data => data?.quantity).reduce((prev, next) => prev + next);
+            const plusPoint = order?.carts?.map(data => data?.quantity).reduce((prev, next) => prev + next);
 
             const point = await this.pointRepository.findOneBy({ user: order?.user });
 

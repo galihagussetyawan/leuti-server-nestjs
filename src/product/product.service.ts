@@ -43,8 +43,12 @@ export class ProductService {
         try {
 
             return await this.productRepository.find({
+                where: {
+                    status: true,
+                },
                 relations: {
                     images: true,
+                    discounts: true,
                 },
             });
 
@@ -63,6 +67,7 @@ export class ProductService {
                 where: { id },
                 relations: {
                     images: true,
+                    discounts: true,
                 }
             });
 
@@ -83,13 +88,14 @@ export class ProductService {
         try {
 
             const product = new ProductEntity();
-            product.name = productBody.name;
-            product.price = productBody.price;
-            product.stock = productBody.stock;
-            product.category = productBody.category;
-            product.description = productBody.description;
-            product.advantage = productBody.advantage;
-            product.application = productBody.application;
+            product.name = productBody?.name;
+            product.price = productBody?.price;
+            product.stock = productBody?.stock;
+            product.category = productBody?.category;
+            product.description = productBody?.description;
+            product.advantage = productBody?.advantage;
+            product.application = productBody?.application;
+            product.status = productBody?.status;
             product.updatedAt = Date.now().toString();
 
             return await this.productRepository.update(id, product);

@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { RoleEntity } from "src/role/role.entity";
 import { AuthService } from "src/auth/auth.service";
 import { PointService } from "src/point/point.service";
-import { UserDetailEntity } from "src/user-detail/user-detail.entity";
 
 @Injectable()
 export class UserService {
@@ -14,7 +13,6 @@ export class UserService {
     constructor(
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
         @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
-        @InjectRepository(UserDetailEntity) private userDetailRepository: Repository<UserDetailEntity>,
         private authService: AuthService,
         private pointService: PointService,
     ) { };

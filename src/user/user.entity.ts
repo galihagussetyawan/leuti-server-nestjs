@@ -45,7 +45,7 @@ export class UserEntity {
     })
     role: RoleEntity[];
 
-    @OneToOne(() => UserDetailEntity, { cascade: true })
+    @OneToOne(() => UserDetailEntity, { cascade: true, onDelete: 'CASCADE' })
     @JoinColumn()
     userDetail: UserDetailEntity;
 }
