@@ -9,8 +9,8 @@ export class RewardEntity {
     @Column({ name: 'point' })
     point: number;
 
-    @Column({ name: 'day' })
-    day: number;
+    @Column({ name: 'duration' })
+    duration: number;
 
     @Column({ name: 'description' })
     description: string;

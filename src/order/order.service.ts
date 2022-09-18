@@ -1,8 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CartEntity } from "src/cart/cart.entity";
+import { MailService } from "src/mail/mail.service";
 import { PointEntity } from "src/point/point.entity";
 import { ProductEntity } from "src/product/product.entity";
+import { RoyaltyEntity } from "src/royalty/royalty.entity";
 import { ShippingEntity } from "src/shipping/shipping.entity";
 import { UserEntity } from "src/user/user.entity";
 import { In, Repository } from "typeorm";
@@ -18,6 +20,8 @@ export class OrderService {
         @InjectRepository(ShippingEntity) private shippingRepository: Repository<ShippingEntity>,
         @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
         @InjectRepository(PointEntity) private pointRepository: Repository<PointEntity>,
+        @InjectRepository(RoyaltyEntity) private royaltyRepository: Repository<RoyaltyEntity>,
+        private readonly mailService: MailService,
     ) { }
 
     async createOrderByUser(userid: string) {
@@ -32,6 +36,7 @@ export class OrderService {
                 },
                 relations: {
                     product: true,
+                    discount: true,
                 }
             })
 
@@ -87,9 +92,11 @@ export class OrderService {
                     carts: {
                         product: {
                             images: true,
-                        }
+                        },
+                        discount: true,
                     },
                     user: true,
+                    shipping: true,
                 },
                 select: {
                     user: {
@@ -154,7 +161,7 @@ export class OrderService {
         const statusCheck = () => {
 
             if (status === 'now-orders') {
-                return ['approve', 'in-packaging', 'in-shipping'];
+                return ['approved', 'in-packaging', 'in-shipping'];
             }
 
             if (status === 'history-orders') {
@@ -202,11 +209,26 @@ export class OrderService {
 
         try {
 
+            const order = await this.orderRepository.findOne({
+                where: { id },
+                relations: {
+                    user: true,
+                    carts: {
+                        product: {
+                            images: true,
+                        },
+                        discount: true,
+                    }
+                }
+            })
+
             shippingRequestBody.createdAt = Date.now().toString();
             shippingRequestBody.updatedAt = Date.now().toString();
 
-            const shipping = await this.shippingRepository.save(shippingRequestBody);
+            await this.mailService.sendEmailOrderCreatedToAgent(order?.user?.email, `Leuti Team<${process.env.SYSTEM_EMAIL_USER}>`, order);
+            await this.mailService.sendEmailOrderCreatedToAdmin(`Leuti Team<${process.env.SYSTEM_EMAIL_USER}>`, order, shippingRequestBody);
 
+            const shipping = await this.shippingRepository.save(shippingRequestBody);
             return await this.orderRepository.update(id, { shipping: shipping, status: 'unpaid' });
 
         } catch (error) {
@@ -256,12 +278,15 @@ export class OrderService {
                     carts: true,
                 },
             })
-            const plusPoint = order?.carts?.map(data => data?.quantity).reduce((prev, next) => prev + next);
 
             const point = await this.pointRepository.findOneBy({ user: order?.user });
 
-            await this.pointRepository.update(point.id, { point: point?.point + plusPoint, updatedAt: Date.now().toString() });
-            return await this.orderRepository.update(id, { status: 'approve' });
+            if (order?.amount > 1000000) {
+                await this.pointRepository.update(point.id, { point: point?.point + 10, updatedAt: Date.now().toString() });
+            }
+            // const plusPoint = order?.carts?.map(data => data?.quantity).reduce((prev, next) => prev + next);
+
+            return await this.orderRepository.update(id, { status: 'approved' });
 
         } catch (error) {
 
@@ -299,7 +324,67 @@ export class OrderService {
 
         try {
 
-            return await this.orderRepository.update(id, { status: 'completed' });
+            const order = await this.orderRepository.findOne({
+                where: {
+                    id
+                },
+                relations: {
+                    user: {
+                        sponsor: {
+                            upline: true,
+                        }
+                    },
+                    shipping: true,
+                    carts: true,
+                }
+            })
+
+            if (order.user.sponsor.upline) {
+
+                let userTrackingList = [order.user.sponsor.upline];
+                let currentUserTracking = order.user.sponsor.upline;
+
+                while (currentUserTracking) {
+
+                    const currUser = await this.userRepository.findOne({
+                        where: {
+                            id: currentUserTracking.id
+                        },
+                        relations: {
+                            sponsor: {
+                                upline: true,
+                            }
+                        }
+                    })
+
+                    if (currUser.sponsor.upline) {
+                        userTrackingList.push(currUser?.sponsor?.upline);
+                    }
+
+                    currentUserTracking = currUser?.sponsor?.upline;
+                }
+
+                const listCreateRoyalty: RoyaltyEntity[] = [];
+                let percent = 0;
+
+                userTrackingList.forEach(data => {
+
+                    percent = percent + 3;
+                    const royalty = new RoyaltyEntity();
+
+                    royalty.amount = (percent / 100) * order?.amount;
+                    royalty.user = data;
+                    royalty.createdAt = Date.now().toString();
+                    royalty.updatedAt = Date.now().toString();
+
+                    listCreateRoyalty.push(royalty);
+                })
+
+                await this.royaltyRepository.save(listCreateRoyalty);
+            }
+
+            order.status = 'completed';
+            return await this.orderRepository.save(order);
 
         } catch (error) {
 
@@ -313,7 +398,7 @@ export class OrderService {
         const statusCheck = () => {
 
             if (status === 'now-orders') {
-                return ['approve', 'in-packaging', 'in-shipping'];
+                return ['approved', 'in-packaging', 'in-shipping'];
             }
 
             if (status === 'history-orders') {
@@ -333,6 +418,7 @@ export class OrderService {
                 relations: {
                     carts: {
                         product: true,
+                        discount: true,
                     },
                     user: {
                         userDetail: true,
@@ -356,6 +442,37 @@ export class OrderService {
 
             throw new BadRequestException(error.message);
 
+        }
+    }
+
+    async getCountNewOrders() {
+
+        try {
+
+            return await this.orderRepository.count({
+                where: {
+                    status: In(['unpaid', 'created'])
+                }
+            })
+
+        } catch (error) {
+
+            throw new BadRequestException(error.message);
+        }
+    }
+
+    async getCountNowOrders() {
+
+        try {
+
+            return await this.orderRepository.count({
+                where: {
+                    status: In(['approved', 'in-packaging', 'in-shipping'])
+                }
+            })
+
+        } catch (error) {
+            throw new BadRequestException(error.message);
         }
     }
 }

@@ -1,4 +1,6 @@
 import { RoleEntity } from "src/role/role.entity";
+import { RoyaltyEntity } from "src/royalty/royalty.entity";
+import { SponsorEntity } from "src/sponsor/sponsor.entity";
 import { UserDetailEntity } from "src/user-detail/user-detail.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
@@ -45,7 +47,13 @@ export class UserEntity {
     })
     role: RoleEntity[];
 
-    @OneToOne(() => UserDetailEntity, { cascade: true, onDelete: 'CASCADE' })
+    @OneToOne(() => UserDetailEntity, { cascade: true })
     @JoinColumn()
     userDetail: UserDetailEntity;
+
+    @OneToOne(() => SponsorEntity, (sponsor) => sponsor.user)
+    sponsor: SponsorEntity;
+
+    @OneToMany(() => RoyaltyEntity, (royalty) => royalty.user)
+    royalty: RoyaltyEntity[];
 }

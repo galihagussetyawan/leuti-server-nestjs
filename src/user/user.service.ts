@@ -64,21 +64,26 @@ export class UserService {
                 relations: {
                     role: true,
                     userDetail: true,
+                    sponsor: {
+                        upline: true,
+                        downline: true,
+                    }
                 }
             });
 
-            const responseList = await list.map(data => {
+            const responseList = await list?.map(data => {
 
                 return {
-                    id: data.id,
-                    username: data.username,
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                    email: data.email,
-                    role: data.role,
-                    createdAt: data.createdAt,
-                    updatedAt: data.updatedAt,
-                    detail: data.userDetail,
+                    id: data?.id,
+                    username: data?.username,
+                    firstname: data?.firstname,
+                    lastname: data?.lastname,
+                    email: data?.email,
+                    role: data?.role,
+                    createdAt: data?.createdAt,
+                    updatedAt: data?.updatedAt,
+                    detail: data?.userDetail,
+                    sponsor: data?.sponsor,
                 }
 
             })
@@ -158,20 +163,25 @@ export class UserService {
                 ],
                 relations: {
                     userDetail: true,
+                    sponsor: {
+                        upline: true,
+                        downline: true,
+                    }
                 }
             })
 
             const responseList = await list.map(data => {
 
                 return {
-                    id: data.id,
-                    username: data.username,
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                    role: data.role,
-                    createdAt: data.createdAt,
-                    updatedAt: data.updatedAt,
-                    detail: data.userDetail,
+                    id: data?.id,
+                    username: data?.username,
+                    firstname: data?.firstname,
+                    lastname: data?.lastname,
+                    role: data?.role,
+                    createdAt: data?.createdAt,
+                    updatedAt: data?.updatedAt,
+                    detail: data?.userDetail,
+                    sponsor: data?.sponsor,
                 }
             })
 

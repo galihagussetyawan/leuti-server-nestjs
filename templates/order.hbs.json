@@ -1,0 +1,63 @@
+{
+  "id": "56bfbb67-7d26-4601-b7a4-b8fbf7e61359",
+    "amount": 2050000,
+    "status": "created",
+    "createdAt": "1662736757261",
+    "carts": [
+      {
+        "id": "ddae8efc-5cdc-47c1-8eeb-4aa47fa32ffe",
+        "quantity": 10,
+        "amount": 2050000,
+        "checkout": false,
+        "createdAt": "1662736746145",
+        "updatedAt": "1662736753085",
+        "visibility": false,
+        "product": {
+          "id": "b1a1429c-3796-40a9-84e1-d7f5e68e2759",
+          "name": "Leuti Perfect Sublimate Serum",
+          "price": 205000,
+          "stock": 168,
+          "description": "Leuti Perfect Sublimate Serum mampu menggantikan 5 rangkaian skincare anda untuk mendapatkan kulit wajah yang lebih putih, cerah, flawless, halus dan kenyal. ",
+          "category": "skincare",
+          "advantage": "",
+          "application": "",
+          "ingredient": "",
+          "createdAt": "1661157994025",
+          "updatedAt": "1662468800582",
+          "status": true,
+          "images": [
+            {
+              "id": "51346700-d6f1-437d-bcb8-5ddf04538c71",
+              "name": "leuti-edcd900f-490e-4056-9d3a-21e07422b8ad.jpg",
+              "mimetype": "image/jpeg",
+              "path": "uploads/leuti-edcd900f-490e-4056-9d3a-21e07422b8ad.jpg"
+            },
+            {
+              "id": "6187431b-6ee0-4725-9fe3-72808b2306f6",
+              "name": "leuti-365dcfd6-1092-498d-81e0-f2993ba63deb.jpg",
+              "mimetype": "image/jpeg",
+              "path": "uploads/leuti-365dcfd6-1092-498d-81e0-f2993ba63deb.jpg"
+            },
+            {
+              "id": "8d702889-ffbf-4cdb-915c-7305f0670b77",
+              "name": "leuti-42839abf-0a95-45f0-b302-bae99866086d.jpg",
+              "mimetype": "image/jpeg",
+              "path": "uploads/leuti-42839abf-0a95-45f0-b302-bae99866086d.jpg"
+            }
+          ]
+        },
+        "discount": {
+          "id": "7f96d5d3-9fe3-47b1-ae5f-ba46089da771",
+          "quantity": 10,
+          "item": 1,
+          "addOns": null,
+          "createdAt": "1662353254837",
+          "updatedAt": "1662353254837"
+        }
+      }
+    ],
+    "user": {
+      "id": "62e637fe-07bb-4a2e-82d0-f3d1181c5e37",
+      "username": "agentdemo"
+    }
+}

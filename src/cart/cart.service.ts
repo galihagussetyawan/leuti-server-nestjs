@@ -44,11 +44,12 @@ export class CartService {
 
             //check discount product
             const cart = new CartEntity();
-            const discount = product?.discounts.filter(data => data?.quantity === cartBody.quantity)[0];
+            const discount = product?.discounts?.filter(data => data?.quantity === Number(cartBody.quantity))[0];
 
             if (discount) {
-                cart.quantity = cartBody?.quantity + discount?.item;
                 cart.discount = discount;
+            } else {
+                cart.discount = null;
             }
 
             cart.user = user;
@@ -122,10 +123,9 @@ export class CartService {
                 throw new BadRequestException(`Produk tersisa ${cart?.product?.stock}`);
             }
 
-            const discount = cart?.product?.discounts?.filter(data => data?.quantity === cartBody?.quantity)[0];
+            const discount = cart?.product?.discounts?.filter(data => data?.quantity === Number(cartBody?.quantity))[0];
 
             if (discount) {
-                cart.quantity = cartBody?.quantity + discount?.item;
                 cart.discount = discount;
             } else {
                 cart.discount = null;

@@ -31,7 +31,7 @@ export class RewardService {
 
             return await this.rewardRepository.update(id, {
                 point: requestRewardBody?.point,
-                day: requestRewardBody?.day,
+                duration: requestRewardBody?.duration,
                 description: requestRewardBody?.description,
                 updatedAt: Date.now().toString(),
             })
@@ -60,7 +60,11 @@ export class RewardService {
 
         try {
 
-            return await this.rewardRepository.find();
+            return await this.rewardRepository.find({
+                order: {
+                    point: 'DESC',
+                }
+            })
 
         } catch (error) {
 

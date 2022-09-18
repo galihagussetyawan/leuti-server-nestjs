@@ -274,4 +274,45 @@ export class OrderController {
 
         }
     }
+
+    //count order
+    @Get('orders/new/count')
+    async getCountNewOrders(@Res() res: Response) {
+
+        try {
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.orderService.getCountNewOrders(),
+            })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+
+        }
+    }
+
+    @Get('orders/now/count')
+    async getCountNowOrders(@Res() res: Response) {
+
+        try {
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.orderService.getCountNowOrders(),
+            })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+
+        }
+    }
 }

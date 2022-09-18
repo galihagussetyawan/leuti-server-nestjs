@@ -54,7 +54,7 @@ export class PointService {
 
         try {
 
-            const points = await this.pointRepository.findOne({
+            const point = await this.pointRepository.findOne({
                 relations: {
                     user: true,
                 },
@@ -65,12 +65,10 @@ export class PointService {
                 }
             })
 
-            return {
-                point: points.point,
-            }
+            return point;
 
         } catch (error) {
-
+            throw new BadRequestException(error.message);
         }
     }
 
@@ -95,9 +93,10 @@ export class PointService {
             return await pointList.map(data => {
 
                 return {
-                    point: data.point,
-                    username: data.user.username,
-                    join: data.user.createdAt,
+                    point: data?.point,
+                    username: data?.user?.username,
+                    join: data?.user?.createdAt,
+                    day: Math.ceil(((((Date.now() - Number(data?.createdAt)) / 1000) / 60) / 60) / 24),
                 }
             })
 

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Order</title>
+    <style>
+        body {
+            padding: 10px 0;
+            color: black;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        td {
+            padding: 10px 0;
+        }
+
+        .main {
+            width: 100%;
+            max-width: 620px;
+            padding: 30px 0;
+            margin: 0 auto;
+            background-color: white;
+        }
+
+        .image-logo {
+            max-width: 120px;
+            padding: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <table class="main">
+        <tr>
+            <td>
+                <img src="https://leuti.asia/_next/image?url=%2Fwordmark-logo.png&w=1920&q=100" class="image-logo" />
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 0 20px;">
+                <h1>Order Incoming</h1>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 10px 20px;">
+                <table style="border: 1px solid gainsboro; padding: 10px 20px">
+                    <tr>
+                        <td>
+                            <div style="color: gray;">ORDER ID</div>
+                            <div>{{id}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="color: gray;">STATUS ORDER</div>
+                            <div>{{status}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="color: gray;">DATE</div>
+                            <div>{{created}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="color: gray;">TOTAL</div>
+                            <div>Rp{{total}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="color: gray;">PAYMENT METHOD</div>
+                            <div>Direct transfer bank</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="color: gray;">AGENT ID</div>
+                            <div>{{username}}</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 0 20px;">
+                <h3>Shipping Address</h3>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0 20px;">
+                <table border="1px" style="border: 1px solid gainsboro; border-collapse: collapse;">
+                    {{#shipping}}
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Name</td>
+                        <td style="padding: 10px 20px;">{{name}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Address</td>
+                        <td style="padding: 10px 20px;">{{address}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Country</td>
+                        <td style="padding: 10px 20px;">{{country}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Province</td>
+                        <td style="padding: 10px 20px;">{{province}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">City</td>
+                        <td style="padding: 10px 20px;">{{city}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">District</td>
+                        <td style="padding: 10px 20px;">{{district}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Village</td>
+                        <td style="padding: 10px 20px;">{{village}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Postal Code</td>
+                        <td style="padding: 10px 20px;">{{postalCode}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 20px; font-weight: bold;">Phone</td>
+                        <td style="padding: 10px 20px;">{{phone}}</td>
+                    </tr>
+                    {{/shipping}}
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 0 20px;">
+                <h3>Order Details</h3>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 0 20px;">
+                <table border="1px" style="border: 1px solid gainsboro; border-collapse: collapse;">
+                    <tr style="font-weight: bold;">
+                        <td style="width: 50%; padding: 0 20px;">Product</td>
+                        <td style="width: 50%; text-align: center;">Total</td>
+                    </tr>
+                    {{#each carts}}
+                    <tr>
+                        <td style="padding: 10px 20px;">
+                            <div style="font-weight: bold">{{product.name}}</div>
+                            <div>{{quantity}} item</div>
+                            <div>Rp{{product.price}}</div>
+                        </td>
+                        <td style="text-align: center;">Rp{{amount}}</td>
+                    </tr>
+                    {{/each}}
+                    <tr style="text-align: center; font-weight: bold;">
+                        <td>Subtotal :</td>
+                        <td>Rp{{subtotal}}</td>
+                    </tr>
+                    <tr style="text-align: center; font-weight: bold;">
+                        <td>Bonus :</td>
+                        <td style="font-weight: 500; text-align:start; padding: 10px 20px">
+                            {{#each carts}}
+                            {{#if discount}}
+                            <div style="padding: 10px 0">
+                                <div>{{product.name}}</div>
+                                <div style="padding: 0 20px; color: gray;">
+                                    <span>items :</span>
+                                    <span>+{{discount.item}} items</span>
+                                </div>
+                                <div style="padding: 0 20px; color: gray;">
+                                    <span>add ons :</span>
+                                    <span>{{discount.addOns}}</span>
+                                </div>
+                            </div>
+                            {{else}}
+                            <div style="text-align: center;">-</div>
+                            {{/if}}
+                            {{/each}}
+                        </td>
+                    </tr>
+                    <tr style="text-align: center; font-weight: bold;">
+                        <td>Total :</td>
+                        <td style="color: green;">Rp{{total}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>
