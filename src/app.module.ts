@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { MysqlDatabaseConnectionConfig } from './commons/config/database/mysql-database-connection.config';
+import { CronJobModule } from './cron-job/cron-job.module';
 import { DiscountModule } from './discount/discount.module';
 import { ImageModule } from './image/image.module';
 import { MailModule } from './mail/mail.module';
@@ -20,6 +21,7 @@ import { ShippingModule } from './shipping/shipping,module';
 import { SponsorModule } from './sponsor/sponsor.module';
 import { UserDetailModule } from './user-detail/user-detail.module';
 import { UserModule } from './user/user.module';
+import { WithdrawModule } from './withdraw/withdraw.module';
 
 @Module({
   imports: [
@@ -49,6 +51,9 @@ import { UserModule } from './user/user.module';
     RewardClaimModule,
     SponsorModule,
     RoyaltyModule,
+    WithdrawModule,
+    CronJobModule,
+
   ],
   controllers: [AppController],
   providers: [

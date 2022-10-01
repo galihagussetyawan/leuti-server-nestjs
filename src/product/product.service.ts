@@ -95,6 +95,7 @@ export class ProductService {
             product.description = productBody?.description;
             product.advantage = productBody?.advantage;
             product.application = productBody?.application;
+            product.ingredient = productBody?.ingredient;
             product.status = productBody?.status;
             product.updatedAt = Date.now().toString();
 

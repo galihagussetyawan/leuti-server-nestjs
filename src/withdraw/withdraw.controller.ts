@@ -5,67 +5,26 @@ import { PrincipalDecorator } from "src/commons/decorators/principal.decorator";
 import { Roles } from "src/role/decorator/roles.decorator";
 import { RolesGuard } from "src/role/guard/roles.guard";
 import { Role } from "src/role/role.enum";
-import { RoyaltyService } from "./royalty.service";
+import { WithdrawService } from "./withdraw.service";
 
 @Controller('api')
-export class RoyaltyController {
+export class WithdrawController {
 
     constructor(
-        private royaltyService: RoyaltyService,
+        private readonly withdrawService: WithdrawService,
     ) { }
 
-    @Post('royalty')
-    async createRoyalty(@Req() req: Request, @Res() res: Response) {
-
-        try {
-
-            const { userid } = req.query;
-
-            res.status(HttpStatus.OK).send({
-                status: HttpStatus.OK,
-                data: await this.royaltyService.createRoyalty(userid.toString()),
-            })
-
-        } catch (error) {
-            res.status(error?.status).send({
-                status: error?.status,
-                error_message: error?.message,
-            })
-        }
-    }
-
-    @Get('royalties/all')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    async getAllListRoyaty(@Res() res: Response) {
-
-        try {
-
-            res.status(HttpStatus.OK).send({
-                status: HttpStatus.OK,
-                data: await this.royaltyService.getAllListRoyalty(),
-            })
-
-        } catch (error) {
-
-            res.status(error.status).send({
-                status: error.status,
-                error_message: error.message,
-            })
-
-        }
-    }
-
-    @Get('royalties')
+    @Post('withdraw')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.AGENT)
-    async getRoyaltiesByUser(@PrincipalDecorator() principal: any, @Res() res: Response) {
+    async createWithdrawByUser(@PrincipalDecorator() principal: any, @Res() res: Response) {
 
         try {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.royaltyService.getRoyaltiesByUser(principal.sub),
+                message: 'success request withdraw',
+                data: await this.withdrawService.createWithdrawByUser(principal.sub),
             })
 
         } catch (error) {
@@ -78,17 +37,43 @@ export class RoyaltyController {
         }
     }
 
-    @Get('royalties/search')
-    async getSearchRoyaltiesListByUser(@Req() req: Request, @Res() res: Response) {
+    @Post('withdraw/complete')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    async completeWithdrawById(@Req() req: Request, @Res() res: Response) {
 
         try {
 
-            const { search } = req.query;
+            const { id } = req.query;
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.royaltyService.getSearchRoyaltiesListByUser(search.toString()),
+                message: 'success to completed withdraw royalty',
+                data: await this.withdrawService.completeWithdrawById(id.toString()),
             })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+
+        }
+    }
+
+    @Get('withdraw')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.AGENT)
+    async getWithdrawByUser(@PrincipalDecorator() principal: any, @Res() res: Response) {
+
+        try {
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.withdrawService.getWithdrawByUser(principal.sub),
+            })
+
 
         } catch (error) {
 

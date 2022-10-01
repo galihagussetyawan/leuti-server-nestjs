@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { In, Like, Not, Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
 import * as bcrypt from 'bcrypt';
 import { RoleEntity } from "src/role/role.entity";
@@ -56,11 +56,24 @@ export class UserService {
         }
     }
 
-    async getAllUser() {
+    async getAllUser(page: number) {
 
         try {
 
+            const adminUsers = await this.userRepository.find({
+                where: {
+                    role: {
+                        name: 'admin',
+                    }
+                },
+                relations: {
+                    role: true,
+                }
+            })
+
             const [list, count] = await this.userRepository.findAndCount({
+                take: 10,
+                skip: (page - 1) * 10,
                 relations: {
                     role: true,
                     userDetail: true,
@@ -68,7 +81,13 @@ export class UserService {
                         upline: true,
                         downline: true,
                     }
-                }
+                },
+                order: {
+                    createdAt: 'DESC',
+                },
+                where: {
+                    id: Not(In(adminUsers?.map(data => data?.id)))
+                },
             });
 
             const responseList = await list?.map(data => {
@@ -89,8 +108,9 @@ export class UserService {
             })
 
             return {
-                total: count,
                 items: await responseList,
+                total: count,
+                totalPages: Math.ceil(count / 10),
             }
 
         } catch (error) {
@@ -112,7 +132,7 @@ export class UserService {
             relations: {
                 role: true,
                 userDetail: true,
-            }
+            },
         })
 
 

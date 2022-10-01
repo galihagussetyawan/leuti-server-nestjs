@@ -2,6 +2,7 @@ import { RoleEntity } from "src/role/role.entity";
 import { RoyaltyEntity } from "src/royalty/royalty.entity";
 import { SponsorEntity } from "src/sponsor/sponsor.entity";
 import { UserDetailEntity } from "src/user-detail/user-detail.entity";
+import { WithdrawEntity } from "src/withdraw/withdraw.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'users' })
@@ -24,6 +25,9 @@ export class UserEntity {
 
     @Column({ name: 'email', unique: true })
     email: string;
+
+    @Column({ name: 'suspend', default: false })
+    suspend: boolean;
 
     @Column({ nullable: true })
     createdAt: string;
@@ -56,4 +60,7 @@ export class UserEntity {
 
     @OneToMany(() => RoyaltyEntity, (royalty) => royalty.user)
     royalty: RoyaltyEntity[];
+
+    @OneToMany(() => WithdrawEntity, (withdraw) => withdraw.user)
+    withdraw: WithdrawEntity[];
 }

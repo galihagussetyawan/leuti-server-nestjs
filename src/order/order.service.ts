@@ -7,7 +7,7 @@ import { ProductEntity } from "src/product/product.entity";
 import { RoyaltyEntity } from "src/royalty/royalty.entity";
 import { ShippingEntity } from "src/shipping/shipping.entity";
 import { UserEntity } from "src/user/user.entity";
-import { In, Repository } from "typeorm";
+import { In, LessThan, MoreThan, Repository } from "typeorm";
 import { OrderEntity } from "./order.entity";
 
 @Injectable()
@@ -82,7 +82,7 @@ export class OrderService {
         }
     }
 
-    async getOrderById(id: string, userid: string) {
+    async getOrderById(id: number, userid: string) {
 
         try {
 
@@ -239,7 +239,7 @@ export class OrderService {
     }
 
     //seller function order service
-    async cancelOrderById(id: string) {
+    async cancelOrderById(id: number) {
 
         try {
 
@@ -267,7 +267,7 @@ export class OrderService {
         }
     }
 
-    async approveOrder(id: string) {
+    async approveOrder(id: number) {
 
         try {
 
@@ -320,7 +320,7 @@ export class OrderService {
         }
     }
 
-    async completeOrderById(id: string) {
+    async completeOrderById(id: number) {
 
         try {
 
@@ -341,10 +341,10 @@ export class OrderService {
 
             if (order.user.sponsor.upline) {
 
-                let userTrackingList = [order.user.sponsor.upline];
+                let userTrackingList = [];
                 let currentUserTracking = order.user.sponsor.upline;
 
-                while (currentUserTracking) {
+                while (currentUserTracking && userTrackingList.length < 2) {
 
                     const currUser = await this.userRepository.findOne({
                         where: {
@@ -364,6 +364,9 @@ export class OrderService {
                     currentUserTracking = currUser?.sponsor?.upline;
                 }
 
+                console.log(userTrackingList);
+
+
                 const listCreateRoyalty: RoyaltyEntity[] = [];
                 let percent = 0;
 
@@ -380,11 +383,11 @@ export class OrderService {
                     listCreateRoyalty.push(royalty);
                 })
 
-                await this.royaltyRepository.save(listCreateRoyalty);
+                // await this.royaltyRepository.save(listCreateRoyalty);
             }
 
             order.status = 'completed';
-            return await this.orderRepository.save(order);
+            // return await this.orderRepository.save(order);
 
         } catch (error) {
 
@@ -393,7 +396,7 @@ export class OrderService {
         }
     }
 
-    async searchOrders(id: string, status: string) {
+    async searchOrders(id: number, status: string) {
 
         const statusCheck = () => {
 
@@ -470,6 +473,39 @@ export class OrderService {
                     status: In(['approved', 'in-packaging', 'in-shipping'])
                 }
             })
+
+        } catch (error) {
+            throw new BadRequestException(error.message);
+        }
+    }
+
+    async getTotalOrders() {
+
+        try {
+
+            const today = new Date();
+            today.setHours(0);
+            today.setMinutes(0);
+            today.setMilliseconds(0);
+
+            const orders = await this.orderRepository.find({
+                where: {
+                    createdAt: MoreThan(today.getTime().toString()),
+                    status: In(['approved', 'completed'])
+                },
+                relations: {
+                    carts: true,
+                },
+                select: {
+                    amount: true,
+                    carts: true,
+                },
+            });
+
+            return {
+                amount: orders?.length === 0 ? 0 : await orders?.map(data => data?.amount).reduce((prev, next) => prev + next),
+                quantity: orders.length === 0 ? 0 : await orders?.flatMap(data => data?.carts?.map(cart => cart?.quantity))?.reduce((prev, next) => prev + next),
+            }
 
         } catch (error) {
             throw new BadRequestException(error.message);

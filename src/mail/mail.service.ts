@@ -43,7 +43,7 @@ export class MailService {
         try {
 
             await this.mailerService.sendMail({
-                to: 'galihdevelopment@gmail.com',
+                to: 'leutibeauty@gmail.com',
                 from: from,
                 subject: 'Order Incoming',
                 template: 'order-to-admin',

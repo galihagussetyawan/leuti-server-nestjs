@@ -63,4 +63,66 @@ export class RewardClaimService {
             throw new BadRequestException(error?.message)
         }
     }
+
+    async getAllRewardClaims() {
+
+        try {
+
+            const rewardClaimList = await this.rewardClaimRepository.find({
+                order: {
+                    createdAt: 'DESC',
+                },
+                relations: {
+                    user: true,
+                    reward: true,
+                },
+                select: {
+                    id: true,
+                    createdAt: true,
+                    user: {
+                        firstname: true,
+                        lastname: true,
+                    },
+                    reward: {
+                        description: true,
+                    }
+                }
+            })
+
+            return await rewardClaimList?.map(data => {
+
+                return {
+                    firstname: data?.user?.firstname,
+                    lastname: data?.user?.lastname,
+                    reward: data?.reward?.description,
+                    createdAt: data?.createdAt,
+                }
+            })
+
+        } catch (error) {
+            throw new BadRequestException(error?.message)
+        }
+    }
+
+    async getRewardClaimsByUser() {
+
+        try {
+
+            return await this.rewardClaimRepository.find();
+
+        } catch (error) {
+            throw new BadRequestException(error?.message)
+        }
+    }
+
+    async approveRequestClaimRewardById(id: string) {
+
+        try {
+
+            return await this.rewardClaimRepository.update(id, { status: 'approved', 'updatedAt': Date.now().toString() })
+
+        } catch (error) {
+            throw new BadRequestException(error?.message)
+        }
+    }
 }

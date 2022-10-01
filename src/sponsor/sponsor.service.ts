@@ -68,9 +68,9 @@ export class SponsorService {
                 }
             })
 
-            if (sponsor?.downline?.length >= 2) {
-                throw new BadRequestException('the maximum agent downline is 2 agents');
-            }
+            // if (sponsor?.downline?.length >= 2) {
+            //     throw new BadRequestException('the maximum agent downline is 2 agents');
+            // }
 
             if (userDownline?.sponsor?.upline) {
                 throw new BadRequestException('sudah dikenalkan oleh agen lain');
@@ -141,80 +141,30 @@ export class SponsorService {
         }
     }
 
-    async getAllSponsors() {
+    async getAllSponsorsByUser(userid: string) {
 
         try {
 
-            const users = await this.userRepository.find({
-                relations: {
-                    sponsor: {
-                        upline: true,
-                        downline: true,
+            const sponsors = await this.sponsorRepossitory.findOne({
+                where: {
+                    user: {
+                        id: userid,
                     }
+                },
+                relations: {
+                    downline: true,
                 },
                 select: {
-                    id: true,
-                    username: true,
-                    email: true,
-                    sponsor: {
+                    downline: {
                         id: true,
-                        upline: {
-                            id: true,
-                            username: true,
-                        },
-                        downline: {
-                            id: true,
-                            username: true,
-                        }
+                        username: true,
+                        email: true,
+                        createdAt: true,
                     }
                 }
             })
 
-            return users;
-        } catch (error) {
-            throw new BadRequestException(error.message);
-        }
-    }
-
-    async testTrackingUser(userid: string) {
-
-        try {
-
-            const user = await this.userRepository.findOne({
-                where: {
-                    id: userid,
-                },
-                relations: {
-                    sponsor: {
-                        upline: true,
-                    }
-                }
-            })
-
-            const userTrackingList = [user.sponsor.upline];
-            let currentUserTracking = user.sponsor.upline;
-
-            while (currentUserTracking) {
-
-                const curr = await this.userRepository.findOne({
-                    where: {
-                        id: currentUserTracking.id
-                    },
-                    relations: {
-                        sponsor: {
-                            upline: true,
-                        }
-                    }
-                })
-
-                if (curr.sponsor.upline) {
-                    userTrackingList.push(curr.sponsor.upline);
-                }
-
-                currentUserTracking = curr.sponsor.upline;
-            }
-
-            return userTrackingList;
+            return sponsors;
 
         } catch (error) {
             throw new BadRequestException(error.message);

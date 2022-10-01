@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
+import { PrincipalDecorator } from "src/commons/decorators/principal.decorator";
 import { Roles } from "src/role/decorator/roles.decorator";
 import { RolesGuard } from "src/role/guard/roles.guard";
 import { Role } from "src/role/role.enum";
@@ -40,13 +41,13 @@ export class AuthController {
     @Get('/auth/agent')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.AGENT)
-    async isAgent(@Res() res: Response) {
+    async isAgent(@PrincipalDecorator() principal: any, @Res() res: Response) {
 
         try {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: 'agent'
+                data: await this.authService.isAgent((principal.sub))
             })
 
         } catch (error) {

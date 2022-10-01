@@ -9,17 +9,18 @@ import { RoleEntity } from "src/role/role.entity";
 import { RoyaltyEntity } from "src/royalty/royalty.entity";
 import { SponsorEntity } from "src/sponsor/sponsor.entity";
 import { UserDetailEntity } from "src/user-detail/user-detail.entity";
+import { WithdrawEntity } from "src/withdraw/withdraw.entity";
 import { UserController } from "./user.controller";
 import { UserEntity } from "./user.entity";
 import { UserService } from "./user.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([UserEntity, RoleEntity, PointEntity, UserDetailEntity, SponsorEntity, RoyaltyEntity]),
+        TypeOrmModule.forFeature([UserEntity, RoleEntity, PointEntity, UserDetailEntity, SponsorEntity, RoyaltyEntity, WithdrawEntity]),
         AuthModule,
     ],
     controllers: [UserController],
-    providers: [UserService, JwtAuthGuard, RolesGuard, PointService],
+    providers: [UserService, JwtAuthGuard, RolesGuard, PointService, JwtAuthGuard, RolesGuard],
     exports: [TypeOrmModule]
 })
 export class UserModule { }

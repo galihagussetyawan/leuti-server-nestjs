@@ -49,7 +49,7 @@ export class OrderController {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.orderService.getOrderById(id.toString(), principal.sub),
+                data: await this.orderService.getOrderById(Number(id), principal.sub),
             })
 
         } catch (error) {
@@ -141,7 +141,7 @@ export class OrderController {
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
                 message: `order by id: ${id} success approved`,
-                data: await this.orderService.approveOrder(id.toString()),
+                data: await this.orderService.approveOrder(Number(id)),
             })
 
         } catch (error) {
@@ -215,7 +215,7 @@ export class OrderController {
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
                 message: `success completed order id #${id}`,
-                data: await this.orderService.completeOrderById(id?.toString()),
+                data: await this.orderService.completeOrderById(Number(id)),
             })
 
         } catch (error) {
@@ -240,7 +240,7 @@ export class OrderController {
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
                 message: `canceled order id #${id}`,
-                data: await this.orderService.cancelOrderById(id?.toString()),
+                data: await this.orderService.cancelOrderById(Number(id)),
             })
 
         } catch (error) {
@@ -262,7 +262,7 @@ export class OrderController {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.orderService.searchOrders(id?.toString(), status?.toString()),
+                data: await this.orderService.searchOrders(Number(id), status?.toString()),
             })
 
         } catch (error) {
@@ -277,6 +277,8 @@ export class OrderController {
 
     //count order
     @Get('orders/new/count')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     async getCountNewOrders(@Res() res: Response) {
 
         try {
@@ -297,6 +299,8 @@ export class OrderController {
     }
 
     @Get('orders/now/count')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     async getCountNowOrders(@Res() res: Response) {
 
         try {
@@ -304,6 +308,28 @@ export class OrderController {
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
                 data: await this.orderService.getCountNowOrders(),
+            })
+
+        } catch (error) {
+
+            res.status(error.status).send({
+                status: error.status,
+                error_message: error.message,
+            })
+
+        }
+    }
+
+    @Get('orders/total')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    async getTotalOrders(@Res() res: Response) {
+
+        try {
+
+            res.status(HttpStatus.OK).send({
+                status: HttpStatus.OK,
+                data: await this.orderService.getTotalOrders(),
             })
 
         } catch (error) {

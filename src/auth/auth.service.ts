@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/user/user.entity";
 import { Repository } from "typeorm";
@@ -8,7 +8,10 @@ import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AuthService {
 
-    constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>, private jwtService: JwtService) { }
+    constructor(
+        @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+        private jwtService: JwtService
+    ) { }
 
     async signin(usernameEmail: string, password: string) {
 
@@ -25,6 +28,8 @@ export class AuthService {
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) throw new UnauthorizedException('password salah');
+
+        if (user?.suspend) throw new UnauthorizedException('Akun anda terkena suspend. Hubungi admin untuk aktivasi kembali.');
 
         const userRoles = [];
 
@@ -55,5 +60,29 @@ export class AuthService {
         )
 
         return accessToken;
+    }
+
+    async isAgent(userid: string) {
+
+        try {
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    id: userid,
+                },
+                select: {
+                    suspend: true,
+                }
+            })
+
+            if (user.suspend) {
+                throw new ForbiddenException('your account is suspensed');
+            }
+
+            return 'success';
+
+        } catch (error) {
+            throw new BadRequestException(error.message);
+        }
     }
 }

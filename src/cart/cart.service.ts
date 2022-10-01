@@ -38,9 +38,9 @@ export class CartService {
                 throw new BadRequestException('Minimum pembelian 1 items');
             }
 
-            if (cartBody.quantity > product.stock) {
-                throw new BadRequestException(`Produk tersisa ${product.stock}`);
-            }
+            // if (cartBody.quantity > product.stock) {
+            //     throw new BadRequestException(`Produk tersisa ${product.stock}`);
+            // }
 
             //check discount product
             const cart = new CartEntity();
@@ -119,9 +119,9 @@ export class CartService {
                 throw new BadRequestException('Minimun pembelian 1 items');
             }
 
-            if (cartBody?.quantity > cart?.product?.stock) {
-                throw new BadRequestException(`Produk tersisa ${cart?.product?.stock}`);
-            }
+            // if (cartBody?.quantity > cart?.product?.stock) {
+            //     throw new BadRequestException(`Produk tersisa ${cart?.product?.stock}`);
+            // }
 
             const discount = cart?.product?.discounts?.filter(data => data?.quantity === Number(cartBody?.quantity))[0];
 

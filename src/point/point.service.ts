@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/user/user.entity";
-import { Repository } from "typeorm";
+import { In, Not, Repository } from "typeorm";
 import { PointEntity } from "./point.entity";
 
 @Injectable()
@@ -76,27 +76,46 @@ export class PointService {
 
         try {
 
-            const pointList = await this.pointRepository.find({
-                relations: {
-                    user: true,
+            const userAdmin = await this.userRepository.find({
+                where: {
+                    role: {
+                        name: 'admin',
+                    }
                 },
+                relations: {
+                    role: true,
+                }
+            })
+
+            const pointList = await this.pointRepository.find({
                 order: {
                     point: 'DESC',
                 },
                 where: {
                     user: {
-                        role: { name: 'agent' },
+                        id: Not(In(userAdmin?.map(data => data?.id))),
                     }
-                }
+                },
+                relations: {
+                    user: {
+                        role: true,
+                        userDetail: true,
+                    }
+                },
             })
 
-            return await pointList.map(data => {
+            return await pointList?.map(data => {
 
                 return {
                     point: data?.point,
+                    firstname: data?.user?.firstname,
+                    lastname: data?.user?.lastname,
                     username: data?.user?.username,
                     join: data?.user?.createdAt,
-                    day: Math.ceil(((((Date.now() - Number(data?.createdAt)) / 1000) / 60) / 60) / 24),
+                    country: data?.user?.userDetail?.country ?? '-',
+                    city: data.user?.userDetail?.city ?? '-',
+                    day: Math.ceil(((((Date.now() - Number(data?.createdAt)) / 1000) / 60) / 60) / 24) - 1,
+                    // day: new Date().getDate() - new Date(Number(data?.createdAt)).getDate(),
                 }
             })
 

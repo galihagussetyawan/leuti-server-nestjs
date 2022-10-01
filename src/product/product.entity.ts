@@ -17,19 +17,19 @@ export class ProductEntity {
     @Column({ name: 'stock' })
     stock: number;
 
-    @Column({ name: 'description' })
+    @Column({ name: 'description', type: 'longtext' })
     description: string;
 
     @Column({ name: 'category' })
     category: string;
 
-    @Column({ name: 'advantage', nullable: true })
+    @Column({ name: 'advantage', nullable: true, type: 'longtext' })
     advantage: string;
 
-    @Column({ name: 'application', nullable: true })
+    @Column({ name: 'application', nullable: true, type: 'longtext' })
     application: string;
 
-    @Column({ name: 'ingredient', nullable: true })
+    @Column({ name: 'ingredient', nullable: true, type: 'longtext' })
     ingredient: string;
 
     @Column({ name: 'createdAt' })

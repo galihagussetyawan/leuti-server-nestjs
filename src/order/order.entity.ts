@@ -6,8 +6,8 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 @Entity({ name: 'orders' })
 export class OrderEntity {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ name: 'amount', default: 0 })
     amount: number;

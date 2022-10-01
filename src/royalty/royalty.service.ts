@@ -55,8 +55,35 @@ export class RoyaltyService {
                         username: true,
                         email: true,
                     }
+                },
+                order: {
+                    createdAt: 'DESC',
                 }
             })
+
+        } catch (error) {
+            throw new BadRequestException(error?.message);
+        }
+    }
+
+    async getSearchRoyaltiesListByUser(search: string) {
+
+        try {
+
+            const royalties = await this.royaltyRepository.find({
+                where: {
+                    user: [
+                        { id: search },
+                        { username: search },
+                    ],
+                    withdraw: false,
+                }
+            })
+
+            return {
+                total: await royalties?.length === 0 ? 0 : royalties?.map(data => data?.amount).reduce((prev, next) => prev + next),
+                items: await royalties,
+            }
 
         } catch (error) {
             throw new BadRequestException(error?.message);

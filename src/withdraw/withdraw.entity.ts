@@ -1,18 +1,17 @@
-import { RewardEntity } from "src/reward/reward.entity";
 import { UserEntity } from "src/user/user.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({ name: 'reward_claim' })
-export class RewardClaimEntity {
+@Entity({ name: 'withdraw' })
+export class WithdrawEntity {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => UserEntity, { cascade: true })
-    user: UserEntity;
+    @Column({ name: 'amount' })
+    amount: number;
 
-    @ManyToOne(() => RewardEntity, { cascade: true })
-    reward: RewardEntity;
+    @ManyToOne(() => UserEntity, (user) => user.withdraw)
+    user: UserEntity;
 
     @Column({ name: 'status', default: 'on-process' })
     status: string;

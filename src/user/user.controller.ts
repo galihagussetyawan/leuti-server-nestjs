@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { Request, Response } from "express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { PrincipalDecorator } from "src/commons/decorators/principal.decorator";
 import { Roles } from "src/role/decorator/roles.decorator";
 import { RolesGuard } from "src/role/guard/roles.guard";
 import { Role } from "src/role/role.enum";
@@ -34,13 +35,15 @@ export class UserController {
     @Get('users')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
-    async getAllUser(@Res() res: Response) {
+    async getAllUser(@Req() req: Request, @Res() res: Response) {
 
         try {
 
+            const { page } = req?.query;
+
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.userService.getAllUser(),
+                data: await this.userService.getAllUser(Number(page)),
             })
 
         } catch (error) {
@@ -54,25 +57,18 @@ export class UserController {
     }
 
     @Get('user')
-    async getUserById(@Req() req: Request, @Res() res: Response) {
-
-        let { id } = req.query;
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.AGENT)
+    async getUserById(@PrincipalDecorator() principal: any, @Res() res: Response) {
 
         try {
 
             res.status(HttpStatus.OK).send({
                 status: HttpStatus.OK,
-                data: await this.userService.getUserById(id.toString()),
+                data: await this.userService.getUserById(principal.sub),
             })
 
         } catch (error) {
-
-            if (!id) {
-                res.status(HttpStatus.BAD_REQUEST).send({
-                    status: HttpStatus.BAD_REQUEST,
-                    error_message: 'user id kosong'
-                })
-            }
 
             res.status(error.status).send({
                 status: error.status,
